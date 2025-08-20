@@ -33,11 +33,10 @@
 
 <# 
 .SYNOPSIS
-Compresses files to multiple archive files.
+Set Netboot GUID for an Active Directory computer. Can be used when auto-deploying Windows to new machines.
 
 .DESCRIPTION 
-This script takes filtered files from a folder and compresses them to multiple output archive files (with limited size or file count per output archive).
-Set FileSizeByteLimit to 0 for infinite file size per archive. Set FileSizeCountLimit to 0 for infinite file count per archive.
+This script takes an AD computer and a MAC address to update the computer's Netboot GUID with the provided MAC address. Requires you to provide account credentials with permissions to modify AD computers.
 
 .INPUTS
 None
@@ -46,11 +45,11 @@ None
 .None
 
 .EXAMPLE
-Compress-ToMultipleArchiveFiles -Path "$env:USERPROFILE\Downloads" -Filter "*.pdf" -Destination "$env:USERPROFILE\Desktop" -FileSizeByteLimit 100000 -FileSizeCountLimit 10
+Get-ADComputer -Identity MyNewComputer | Set-ADComputerNetbootGuid -MACAddress 'AA:BB:CC:DD:EE:FF' -Credential 'MYDOMAIN\MyServiceAccountName'
 
 #>
 param(
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
     [ValidateNotNull()]
     [Microsoft.ActiveDirectory.Management.ADComputer]$Computer,
 
@@ -83,5 +82,6 @@ try {
 catch {
     throw "Failed to configure netboot GUID for $($Computer.Name). $($PSItem)"
 }
+
 
 Get-ADComputer -Identity $Computer -Property netbootGUID
