@@ -33,7 +33,7 @@
 
 <# 
 .SYNOPSIS
-Set Netboot GUID for an Active Directory computer. Can be used when auto-deploying Windows to new machines.
+Set Netboot GUID for an Active Directory computer. A use-case could be auto-deploying Windows to new machines.
 
 .DESCRIPTION 
 This script takes an AD computer and a MAC address to update the computer's Netboot GUID with the provided MAC address. Requires you to provide account credentials with permissions to modify AD computers.
@@ -85,3 +85,4 @@ catch {
 
 
 Get-ADComputer -Identity $Computer -Property netbootGUID
+
