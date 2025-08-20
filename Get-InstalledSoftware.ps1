@@ -36,7 +36,7 @@
 Get a list of installed software.
 
 .DESCRIPTION 
-This script fetches a list of installed software from the registry and returns them as a list.
+This script fetches a list of installed software from the registry.
 
 .INPUTS
 None
@@ -60,4 +60,5 @@ process {
 
 end {
     return $softwareList
+
 }
