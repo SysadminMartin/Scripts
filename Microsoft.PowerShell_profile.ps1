@@ -1,5 +1,5 @@
 # Set encoding to UTF-8.
-$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+$OutputEncoding = [Console]::InputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 # Set Window title.
 $Host.UI.RawUI.WindowTitle = "PowerShell $((Get-Host).Version)"
@@ -44,4 +44,5 @@ function Prompt {
 Get-ChildItem -Path "$env:USERPROFILE\Documents\PowerShell\ProfileFunctions" -Filter '*.ps1' -File -Recurse | ForEach-Object { . $_.FullName }
 
 # Automatically run tasks each workday.
+
 Start-PSProfileWorkday
