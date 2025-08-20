@@ -34,7 +34,7 @@
 <# 
 
 .DESCRIPTION 
- Upgrade a computer to Windows 11 
+ Upgrade from Windows 10 to Windows 11 
 
 #> 
 [CmdletBinding(SupportsShouldProcess)]
@@ -113,19 +113,19 @@ $WindowsIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $WindowsPrincipal = [Security.Principal.WindowsPrincipal] $WindowsIdentity
 $AdminRole = [Security.Principal.WindowsBuiltInRole]::Administrator
 if (-not $WindowsPrincipal.IsInRole($AdminRole)) {
-    Out-LogFile @logParams -Content 'The script needs to run as administrator.'
-    throw 'The script needs to run as administrator.'
+    Out-LogFile @logParams -Content 'The script needs to run as an administrator.'
+    throw 'The script needs to run as an administrator.'
 }
 
-# Determine if the system is valid for upgrade.
-$isSystemValidForUpgrade = $false
+# Determine if the system is eligible for upgrade.
+$isSystemEligibleForUpgrade = $false
 $osName = (Get-ComputerInfo).OsName
 if ($osName -match 'Windows 10') {
-    $isSystemValidForUpgrade = $true
+    $isSystemEligibleForUpgrade = $true
 }
 
-# Only upgrade if the system is valid for upgrade (or if using the Force parameter).
-if ($isSystemValidForUpgrade -or $Force) {
+# Only upgrade if the system is eligible for upgrade (or if using the Force parameter).
+if ($isSystemEligibleForUpgrade -or $Force) {
     if ((Get-Command -Name 'Confirm-SecureBootUEFI' -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0) {
         try {
             if (-not (Confirm-SecureBootUEFI -ErrorAction SilentlyContinue)) {
@@ -202,12 +202,14 @@ if ($isSystemValidForUpgrade -or $Force) {
 
     if ($PSCmdlet.ShouldProcess("File: $installerFilePath", 'Start Windows 11 upgrade')) {
         try {
-            Write-Verbose 'Started the Windows 11 upgrade. This will take a while...'
+            Write-Verbose ('Started the Windows 11 upgrade at {0}. The upgrade will take approximately 30-60 minutes.' -f (Get-Date -Format 'HH:mm'))
+            Write-Verbose 'The computer will automatically reboot when the upgrade is finished.'
+            Write-Verbose 'Installing Windows 11...'
             Out-LogFile @logParams -Content 'Started the Windows 11 upgrade.'
 
             Start-Process -FilePath $installerFilePath -ArgumentList @('/QuietInstall /SkipEULA /Auto Upgrade /NoRestartUI /CopyLogs {0}' -f $tempDirectoryPath) -Wait
-            Write-Verbose 'Exited the upgrade process (the script cannot know if it was successful or not).'
-            Out-LogFile @logParams -Content 'Exited the upgrade process (the script cannot know if it was successful or not).'
+            Write-Verbose 'Exited the upgrade process (the script cannot know if the upgrade was successful or not).'
+            Out-LogFile @logParams -Content 'Exited the upgrade process (the script cannot know if the upgrade was successful or not).'
         }
         catch {
             Out-LogFile @logParams -Content "The Windows 11 upgrade failed. $PSItem"
